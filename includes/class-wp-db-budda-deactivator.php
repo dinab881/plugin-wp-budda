@@ -22,21 +22,21 @@
  */
 class Wp_Db_Budda_Deactivator {
 
-	/**
-	 * Short Description. (use period)
-	 *
-	 * Long Description.
-	 *
-	 * @since    1.0.0
-	 */
-	public static function deactivate() {
+    /**
+     * Short Description. (use period)
+     *
+     * Long Description.
+     *
+     * @since    1.0.0
+     */
+    public static function deactivate() {
 
-		global $wpdb;
-		$table_name2 = $wpdb->prefix . "budda";
-		$table_name1 = $wpdb->prefix . "buddadates";
-		$wpdb->query( "DROP TABLE IF EXISTS {$table_name1}" );
-		$wpdb->query( "DROP TABLE IF EXISTS {$table_name2}" );
+        global $wpdb;
+        $table_name2 = $wpdb->prefix . "budda";
+        $table_name1 = $wpdb->prefix . "buddadates";
+        $wpdb->query("DROP TABLE IF EXISTS {$table_name1}");
+        $wpdb->query("DROP TABLE IF EXISTS {$table_name2}");
 
-	}
+    }
 
 }

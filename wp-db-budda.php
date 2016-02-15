@@ -14,11 +14,9 @@
  *
  * @wordpress-plugin
  * Plugin Name:       Budda booking plugin
- * Plugin URI:        budda.test
- * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
+ * Description:       This is a simple plugin for booking one room/house.
  * Version:           1.0.0
  * Author:            dina
- * Author URI:        budda.test
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       wp-db-budda

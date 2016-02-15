@@ -12,9 +12,12 @@
  * @subpackage Wp_Db_Budda/admin/partials
  */
 
-require_once( 'class-wp-list-table-custom.php');
+require_once('class-wp-list-table-custom.php');
 //Create an instance of our package class...
-$testListTable = new TT_Example_List_Table();
+
+$plugin_name = $this->plugin_name;
+
+$testListTable = new TT_Example_List_Table($plugin_name);
 //Fetch, prepare, sort, and filter our data...
 $testListTable->prepare_items();
 ?>
@@ -25,12 +28,10 @@ $testListTable->prepare_items();
     <div id="icon-users" class="icon32"><br/></div>
     <h2>List Table Test</h2>
 
-
-
     <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
     <form id="movies-filter" method="get">
         <!-- For plugins, we also need to ensure that the form posts back to our current page -->
-        <input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>" />
+        <input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>"/>
         <!-- Now we can render the completed list table -->
         <?php $testListTable->display() ?>
     </form>

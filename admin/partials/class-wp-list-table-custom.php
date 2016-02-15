@@ -25,12 +25,9 @@
  * Since I will be keeping this tutorial up-to-date for the foreseeable future,
  * I am going to work with the copy of the class provided in WordPress core.
  */
-if(!class_exists('WP_List_Table')){
-    require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+if (!class_exists('WP_List_Table')) {
+    require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
 }
-
-
-
 
 /************************** CREATE A PACKAGE CLASS *****************************
  *******************************************************************************
@@ -46,6 +43,7 @@ if(!class_exists('WP_List_Table')){
  * Our theme for this list table is going to be movies.
  */
 class TT_Example_List_Table extends WP_List_Table {
+    public $plugin_name;
 
     /** ************************************************************************
      * Normally we would be querying data from a database and manipulating that
@@ -58,71 +56,23 @@ class TT_Example_List_Table extends WP_List_Table {
      *
      * @var array
      **************************************************************************/
-   /* var $example_data = array(
-        array(
-            'ID'        => 1,
-            'title'     => '300',
-            'rating'    => 'R',
-            'director'  => 'Zach Snyder'
-        ),
-        array(
-            'ID'        => 2,
-            'title'     => 'Eyes Wide Shut',
-            'rating'    => 'R',
-            'director'  => 'Stanley Kubrick'
-        ),
-        array(
-            'ID'        => 3,
-            'title'     => 'Moulin Rouge!',
-            'rating'    => 'PG-13',
-            'director'  => 'Baz Luhrman'
-        ),
-        array(
-            'ID'        => 4,
-            'title'     => 'Snow White',
-            'rating'    => 'G',
-            'director'  => 'Walt Disney'
-        ),
-        array(
-            'ID'        => 5,
-            'title'     => 'Super 8',
-            'rating'    => 'PG-13',
-            'director'  => 'JJ Abrams'
-        ),
-        array(
-            'ID'        => 6,
-            'title'     => 'The Fountain',
-            'rating'    => 'PG-13',
-            'director'  => 'Darren Aronofsky'
-        ),
-        array(
-            'ID'        => 7,
-            'title'     => 'Watchmen',
-            'rating'    => 'R',
-            'director'  => 'Zach Snyder'
-        ),
-        array(
-            'ID'        => 8,
-            'title'     => '2001',
-            'rating'    => 'G',
-            'director'  => 'Stanley Kubrick'
-        ),
-    );
-*/
+
 
     /** ************************************************************************
      * REQUIRED. Set up a constructor that references the parent constructor. We
      * use the parent reference to set some default configs.
      ***************************************************************************/
-    function __construct(){
+    public function __construct($plugin_name) {
         global $status, $page;
 
+        $this->plugin_name = $plugin_name;
+
         //Set parent defaults
-        parent::__construct( array(
-            'singular'  => 'booking',     //singular name of the listed records
-            'plural'    => 'bookings',    //plural name of the listed records
-            'ajax'      => false        //does this table support ajax?
-        ) );
+        parent::__construct(array(
+            'singular' => 'booking',     //singular name of the listed records
+            'plural' => 'bookings',    //plural name of the listed records
+            'ajax' => false        //does this table support ajax?
+        ));
 
     }
 
@@ -148,8 +98,8 @@ class TT_Example_List_Table extends WP_List_Table {
      * @param array $column_name The name/slug of the column to be processed
      * @return string Text or HTML to be placed inside the column <td>
      **************************************************************************/
-    function column_default($item, $column_name){
-        switch($column_name){
+    public function column_default($item, $column_name) {
+        switch ($column_name) {
             case 'booking_id':
             case 'modification_date':
             case 'firstname':
@@ -160,7 +110,7 @@ class TT_Example_List_Table extends WP_List_Table {
             case 'approved':
                 return $item[$column_name];
             default:
-                return print_r($item,true); //Show the whole array for troubleshooting purposes
+                return print_r($item, true); //Show the whole array for troubleshooting purposes
         }
     }
 
@@ -181,19 +131,21 @@ class TT_Example_List_Table extends WP_List_Table {
      * @param array $item A singular item (one full row's worth of data)
      * @return string Text to be placed inside the column <td> (movie title only)
      **************************************************************************/
-    function column_booking_id($item){
+    public function column_booking_id($item) {
 
         //Build row actions
         $actions = array(
-            'edit'      => sprintf('<a href="?page=%s&action=%s&booking=%s">Edit</a>','wp-db-budda-addnew','edit',$item['booking_id']),
-            'delete'    => sprintf('<a href="?page=%s&action=%s&booking=%s">Delete</a>',$_REQUEST['page'],'delete',$item['booking_id']),
+            'edit' => sprintf('<a href="?page=%s&action=%s&booking=%s">' . __("Edit", $this->plugin_name) . '</a>', $this->plugin_name . '-addnew', 'edit', $item['booking_id']),
+            'delete' => sprintf('<a href="?page=%s&action=%s&booking=%s">' . __("Delete", $this->plugin_name) . '</a>', $_REQUEST['page'], 'delete', $item['booking_id']),
         );
 
         //Return the title contents
         return sprintf('%1$s %2$s',
 
-            /*$1%s*/ $item['booking_id'],
-            /*$2%s*/ $this->row_actions($actions)
+            /*$1%s*/
+            $item['booking_id'],
+            /*$2%s*/
+            $this->row_actions($actions)
         );
     }
 
@@ -207,11 +159,13 @@ class TT_Example_List_Table extends WP_List_Table {
      * @param array $item A singular item (one full row's worth of data)
      * @return string Text to be placed inside the column <td> (movie title only)
      **************************************************************************/
-    function column_cb($item){
+    public function column_cb($item) {
         return sprintf(
             '<input type="checkbox" name="%1$s[]" value="%2$s" />',
-            /*$1%s*/ $this->_args['singular'],  //Let's simply repurpose the table's singular label ("movie")
-            /*$2%s*/ $item['booking_id']                //The value of the checkbox should be the record's id
+            /*$1%s*/
+            $this->_args['singular'],
+            /*$2%s*/
+            $item['booking_id']
         );
     }
 
@@ -229,19 +183,17 @@ class TT_Example_List_Table extends WP_List_Table {
      * @see WP_List_Table::::single_row_columns()
      * @return array An associative array containing column information: 'slugs'=>'Visible Titles'
      **************************************************************************/
-    function get_columns(){
+    public function get_columns() {
         $columns = array(
-            'cb'        => '<input type="checkbox" />', //Render a checkbox instead of text
-            'booking_id'     => 'ID',
-            'modification_date' => 'Modification date',
-            'firstname'    => 'Name',
-            'secondname'  => 'Lastname',
-            'phone' => 'Phone',
-            'comments' => 'Comments',
-            'booking_date' => 'Dates',
-            'approved' => 'Status'
-
-
+            'cb' => '<input type="checkbox" />', //Render a checkbox instead of text
+            'booking_id' => __("ID", $this->plugin_name),
+            'modification_date' => __("Modification date", $this->plugin_name),
+            'firstname' => __("Name", $this->plugin_name),
+            'secondname' => __("Lastname", $this->plugin_name),
+            'phone' => __("Phone", $this->plugin_name),
+            'comments' => __("Details", $this->plugin_name),
+            'booking_date' => __("Dates", $this->plugin_name),
+            'approved' => __("Status", $this->plugin_name)
         );
         return $columns;
     }
@@ -261,13 +213,13 @@ class TT_Example_List_Table extends WP_List_Table {
      *
      * @return array An associative array containing all the columns that should be sortable: 'slugs'=>array('data_values',bool)
      **************************************************************************/
-    function get_sortable_columns() {
+    public function get_sortable_columns() {
         $sortable_columns = array(
-            'booking_id'     => array('booking_id',false),     //true means it's already sorted
-            'firstname'    => array('firstname',false),
-            'approved'  => array('approved',false),
-            'secondname'  => array('secondname',false),
-            'modification_date'  => array('modification_date',false),
+            'booking_id' => array('booking_id', false),     //true means it's already sorted
+            'firstname' => array('firstname', false),
+            'approved' => array('approved', false),
+            'secondname' => array('secondname', false),
+            'modification_date' => array('modification_date', false),
 
 
         );
@@ -289,10 +241,10 @@ class TT_Example_List_Table extends WP_List_Table {
      *
      * @return array An associative array containing all the bulk actions: 'slugs'=>'Visible Titles'
      **************************************************************************/
-    function get_bulk_actions() {
+    public function get_bulk_actions() {
         $actions = array(
-            'delete'    => 'Delete',
-            'approve' => 'Approve'
+            'delete' => __("Delete", $this->plugin_name),
+            'approve' => __("Approve", $this->plugin_name)
         );
         return $actions;
     }
@@ -305,52 +257,54 @@ class TT_Example_List_Table extends WP_List_Table {
      *
      * @see $this->prepare_items()
      **************************************************************************/
-    function process_bulk_action() {
+    public function process_bulk_action() {
         global $wpdb;
         $table_name2 = $wpdb->prefix . "budda";
         $table_name1 = $wpdb->prefix . "buddadates";
-        //Detect when a bulk action is being triggered...
-      /*  if( 'delete'===$this->current_action() ) {
-            wp_die('Items deleted (or they would be if we had items to delete)!');
-        }*/
+
 
         // security check!
-        if ( isset( $_POST['_wpnonce'] ) && ! empty( $_POST['_wpnonce'] ) ) {
-
-            $nonce  = filter_input( INPUT_POST, '_wpnonce', FILTER_SANITIZE_STRING );
+        if (isset($_POST['_wpnonce']) && !empty($_POST['_wpnonce'])) {
+            $nonce = filter_input(INPUT_POST, '_wpnonce', FILTER_SANITIZE_STRING);
             $action = 'bulk-' . $this->_args['plural'];
 
-            if ( ! wp_verify_nonce( $nonce, $action ) )
-                wp_die( 'Nope! Security check failed!' );
+            if (!wp_verify_nonce($nonce, $action))
+                wp_die(__("Nope! Security check failed!", $this->plugin_name));
 
         }
 
-        $ids = isset( $_GET['booking'] ) ? $_GET['booking'] : false;
+        $ids = array();
 
-        if ( ! is_array( $ids ) )
-            $ids = array( $ids );
+        if(isset($_GET['booking'])){
 
+            foreach ((array)$_GET['booking'] as $id) {
+                $id = intval($id);
+                if ($id) $ids[] = (string)$id;
+            }
+
+            $limit = count($ids);
+
+            if ($limit > 0) {
+                $idsStr = join(',', array_fill(0, $limit, '%s'));
+            }
+
+        }
 
 
 
         $action = $this->current_action();
 
-        switch ( $action ) {
+        switch ($action) {
 
             case 'delete':
-                foreach ( $ids as $id ) {
-                    $wpdb->query(
-                        $wpdb->prepare("DELETE t2,t1 FROM  $table_name2 AS t2 LEFT JOIN $table_name1 AS t1 USING(booking_id) WHERE t2.booking_id = %d", $id)
-                    );
-
-                }
+                $wpdb->query(
+                    $wpdb->prepare("DELETE FROM $table_name2  WHERE booking_id IN ($idsStr)",$ids)
+                );
                 break;
 
             case 'approve':
-                foreach ( $ids as $id ) {
-                    $wpdb->query(
-                        $wpdb->prepare("UPDATE $table_name1 SET approved = 1 WHERE booking_id = %d", $id)
-                    );
+                foreach ($ids as $id) {
+                    $wpdb->query($wpdb->prepare("UPDATE $table_name1 SET approved = 1 WHERE booking_id = %d", $id));
 
                 }
                 break;
@@ -362,7 +316,6 @@ class TT_Example_List_Table extends WP_List_Table {
         }
 
         return;
-
 
 
     }
@@ -383,13 +336,11 @@ class TT_Example_List_Table extends WP_List_Table {
      * @uses $this->get_pagenum()
      * @uses $this->set_pagination_args()
      **************************************************************************/
-    function prepare_items() {
+    public function prepare_items() {
         global $wpdb; //This is used only if making any database queries
 
         $table_name2 = $wpdb->prefix . "budda";
         $table_name1 = $wpdb->prefix . "buddadates";
-
-
 
 
         /**
@@ -426,8 +377,6 @@ class TT_Example_List_Table extends WP_List_Table {
         $this->process_bulk_action();
 
 
-
-
         /**
          * This checks for sorting input and sorts the data in our array accordingly.
          *
@@ -436,17 +385,10 @@ class TT_Example_List_Table extends WP_List_Table {
          * to a custom query. The returned data will be pre-sorted, and this array
          * sorting technique would be unnecessary.
          */
-        /*function usort_reorder($a,$b){
-            $orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'firstname'; //If no sort, default to title
-            $order = (!empty($_REQUEST['order'])) ? $_REQUEST['order'] : 'asc'; //If no order, default to asc
-            $result = strcmp($a[$orderby], $b[$orderby]); //Determine sort order
-            return ($order==='asc') ? $result : -$result; //Send final sort direction to usort
-        }
-        usort($data, 'usort_reorder');*/
 
         $total_items = $wpdb->get_var("SELECT COUNT(booking_id) FROM $table_name2");
 
-        $paged = isset($_REQUEST['paged']) ? max(0, intval($_REQUEST['paged']) - 1)* $per_page : 0;
+        $paged = isset($_REQUEST['paged']) ? max(0, intval($_REQUEST['paged']) - 1) * $per_page : 0;
         $orderby = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? $_REQUEST['orderby'] : 'booking_id';
         $order = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? $_REQUEST['order'] : 'asc';
 
@@ -454,30 +396,35 @@ class TT_Example_List_Table extends WP_List_Table {
         $mylink = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name2 ORDER BY $orderby $order LIMIT %d OFFSET %d", $per_page, $paged), ARRAY_A);
 
 
-
-        foreach ( $mylink as $row => $val ) {
+        //modify some data before printing
+        foreach ($mylink as $row => $val) {
             $str = '';
             $status = '';
             $id = $val['booking_id'];
-            $mylink2 = $wpdb->get_results("SELECT * FROM ".$table_name1." WHERE booking_id = ".$id, ARRAY_A);
+            $mylink2 = $wpdb->get_results($wpdb->prepare("SELECT * FROM " . $table_name1 . " WHERE booking_id = %d ", $id), ARRAY_A);
 
 
-            foreach($mylink2 as $key => $value){
-                if(sizeof($mylink2)-1 == $key )
-                    $str.= date("d.m.Y", strtotime($value['booking_date']));
+            foreach ($mylink2 as $key => $value) {
+                if (sizeof($mylink2) - 1 == $key)
+                    $str .= date("d.m.Y", strtotime($value['booking_date']));
                 else
-                    $str.= date("d.m.Y", strtotime($value['booking_date'])).', ';
+                    $str .= date("d.m.Y", strtotime($value['booking_date'])) . ', ';
                 $status = $value['approved'];
             }
-            $mylink[$row]['booking_date'] = $str;
-            if($status == 1)
-              $mylink[$row]['approved'] = 'approved';
-            if($status == 0)
-                $mylink[$row]['approved'] = 'not approved';
 
-            //array_push($mydata, $row);
+            //show dates string for bookings
+            $mylink[$row]['booking_date'] = $str;
+
+
+            //show status for booking (approved or not)
+            if ($status == 1)
+                $mylink[$row]['approved'] = __("approved", $this->plugin_name);
+            if ($status == 0)
+                $mylink[$row]['approved'] = __("not approved", $this->plugin_name);
+
+
         }
-      //print_r($mylink);
+
         $this->items = $mylink;
 
         /**
@@ -489,7 +436,7 @@ class TT_Example_List_Table extends WP_List_Table {
          * use sort and pagination data to build a custom query instead, as you'll
          * be able to use your precisely-queried data immediately.
          */
-       // $data = $mylink;
+        // $data = $mylink;
 
 
         /***********************************************************************
@@ -511,7 +458,7 @@ class TT_Example_List_Table extends WP_List_Table {
          * looking at. We'll need this later, so you should always include it in
          * your own package classes.
          */
-      //  $current_page = $this->get_pagenum();
+        //  $current_page = $this->get_pagenum();
 
         /**
          * REQUIRED for pagination. Let's check how many items are in our data array.
@@ -527,8 +474,7 @@ class TT_Example_List_Table extends WP_List_Table {
          * to ensure that the data is trimmed to only the current page. We can use
          * array_slice() to
          */
-       // $data = array_slice($data,(($current_page-1)*$per_page),$per_page);
-
+        // $data = array_slice($data,(($current_page-1)*$per_page),$per_page);
 
 
         /**
@@ -541,24 +487,25 @@ class TT_Example_List_Table extends WP_List_Table {
         /**
          * REQUIRED. We also have to register our pagination options & calculations.
          */
-        $this->set_pagination_args( array(
-            'total_items' => $total_items,                  //WE have to calculate the total number of items
-            'per_page'    => $per_page,                     //WE have to determine how many items to show on a page
-            'total_pages' => ceil($total_items/$per_page)   //WE have to calculate the total number of pages
-        ) );
+        $this->set_pagination_args(array(
+                'total_items' => $total_items,                  //WE have to calculate the total number of items
+                'per_page' => $per_page,                     //WE have to determine how many items to show on a page
+                'total_pages' => ceil($total_items / $per_page)   //WE have to calculate the total number of pages
+            )
+        );
     }
 
-    function extra_tablenav( $which )
-    {
+    public function extra_tablenav($which) {
         global $pagenow, $plugin_page;
-        $this_page = add_query_arg( 'page', $plugin_page, admin_url( $pagenow ) );
-        //$this_page = $plugin_page;
-        $add_link = add_query_arg( 'page', 'wp-db-budda-addnew', $this_page );
-        if ($which == "top") {
 
-            echo '<h3><a href="'.$add_link.'">Add New</a></h3>';
+
+        $this_page = add_query_arg('page', $plugin_page, admin_url($pagenow));
+        $add_link = add_query_arg('page', $this->plugin_name . '-addnew', $this_page);
+
+
+        if ($which == "top") {
+            echo '<h3><a href="' . $add_link . '">' . __("Add New", $this->plugin_name) . '</a></h3>';
         }
     }
 
-
-    }
+}
